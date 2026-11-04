@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f5f1">
+<title>Calendario de las niñas · 2027</title>
+<style>
+:root{
+  --bg:#f6f5f1;--card:#fff;--text:#1f2328;--muted:#777;
+  --enrique:#f5a23a;--maria:#ef86b7;--holiday:#246bfd;--line:#eceae4;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.app{max-width:760px;margin:auto;padding:14px 10px 36px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+h1{font-size:24px;line-height:1.05;margin:0;font-weight:850;letter-spacing:-.5px}
+.subtitle{font-size:12px;color:var(--muted);margin-top:5px}
+.toggle{display:flex;background:#e9e7e1;border-radius:13px;padding:3px}
+.toggle button{border:0;background:transparent;padding:8px 12px;border-radius:10px;font-weight:750;color:#666}
+.toggle button.active{background:#fff;color:#111;box-shadow:0 1px 5px #0001}
+.controls{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:16px;padding:8px 9px;margin-bottom:9px;box-shadow:0 2px 12px #00000008}
+.nav{width:42px;height:40px;border:0;border-radius:11px;background:#f3f2ee;font-size:24px}
+.month-title{font-size:17px;font-weight:850;text-transform:capitalize}
+.card{background:#fff;border-radius:18px;padding:9px 7px 10px;box-shadow:0 2px 12px #00000008}
+.weekdays,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.weekdays div{text-align:center;font-size:10px;font-weight:850;color:#8b8b8b;padding:7px 0}
+.day{min-height:67px;border-radius:11px;padding:7px 5px;display:flex;flex-direction:column;justify-content:space-between;position:relative;border:2px solid transparent}
+.day.empty{background:transparent}
+.day.enrique{background:var(--enrique)}
+.day.maria{background:var(--maria)}
+.day.today{border-color:#111}
+.num{font-size:17px;font-weight:900;width:31px;height:31px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.day.holiday .num{background:#fff;border:3px solid var(--holiday);color:#111}
+.holiday-name{font-size:8px;line-height:1.05;font-weight:850;color:#1547aa;background:#eef4ff;border-radius:5px;padding:3px 4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.owner{font-size:9px;font-weight:850;opacity:.72}
+.legend{display:flex;gap:13px;flex-wrap:wrap;padding:2px 4px 0;font-size:11px;color:#555}
+.leg{display:flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:4px}
+.ring{width:16px;height:16px;border-radius:50%;border:3px solid var(--holiday);background:#fff}
+.note{font-size:10px;color:#888;text-align:left;margin:6px 4px 10px}
+.year-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.mini{background:#fff;border-radius:14px;padding:8px;box-shadow:0 2px 10px #00000008}
+.mini-title{text-align:center;text-transform:capitalize;font-size:12px;font-weight:850;margin-bottom:6px}
+.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mwd{font-size:7px;text-align:center;font-weight:800;color:#aaa}
+.md{aspect-ratio:1;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:750}
+.md.enrique{background:var(--enrique)} .md.maria{background:var(--maria)}
+.md.holiday{border:2px solid var(--holiday);border-radius:50%}
+
+.day.current-week{
+  box-shadow:0 0 0 3px #111 inset;
+}
+.day.change-day{
+  background:#f7df62 !important;
+  color:#111;
+}
+.change-label{
+  font-size:8px;line-height:1.05;font-weight:900;color:#4a3a00;
+  background:#fff6bf;border-radius:5px;padding:3px 4px;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.md.current-week{
+  box-shadow:0 0 0 2px #111 inset;
+}
+.md.change-day{
+  background:#f7df62 !important;
+  color:#111;
+}
+.mini-note{
+  margin-top:5px;
+  font-size:8px;
+  line-height:1.15;
+  color:#6a5a00;
+  font-weight:800;
+  text-align:center;
+  background:#fff6bf;
+  border-radius:6px;
+  padding:3px 4px;
+}
+
+.hidden{display:none!important}
+@media(max-width:620px){
+  .app{max-width:none;padding:10px 8px calc(28px + env(safe-area-inset-bottom));padding-top:calc(10px + env(safe-area-inset-top))}
+  h1{font-size:21px} .header{margin-bottom:10px}
+  .toggle button{padding:7px 10px;font-size:12px}
+      .day{min-height:61px;padding:5px 4px;border-radius:9px}
+  .num{font-size:16px;width:29px;height:29px}
+  .owner{display:none} .holiday-name{font-size:7px;padding:2px 3px}
+  .year-grid{grid-template-columns:repeat(2,1fr);gap:7px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div><h1>Calendario niñas 2027</h1></div>
+    <div class="toggle"><button id="bMonth">Mes</button><button id="bYear" class="active">Año</button></div>
+  </header>
+
+  <div class="legend">
+    <div class="leg"><span class="sw" style="background:var(--enrique)"></span>Enrique</div>
+    <div class="leg"><span class="sw" style="background:var(--maria)"></span>María</div>
+    <div class="leg"><span class="ring"></span>Festivo en Madrid</div>
+    <div class="leg"><span class="sw" style="background:#f7df62"></span>Cambio a medio día</div>
+    <div class="leg"><span class="sw" style="background:white;border:2px solid #111"></span>Semana actual</div>
+  </div>
+  <div class="note">Los festivos mantienen el color del turno. El amarillo se reserva para el cambio especial del 25 de marzo.</div>
+
+
+  <section id="monthView" class="hidden">
+    <div class="controls"><button id="prev" class="nav">‹</button><div id="monthTitle" class="month-title"></div><button id="next" class="nav">›</button></div>
+    <div class="card">
+      <div class="weekdays"><div>LU</div><div>MA</div><div>MI</div><div>JU</div><div>VI</div><div>SÁ</div><div>DO</div></div>
+      <div id="days" class="days"></div>
+    </div>
+  </section>
+
+  <section id="yearView"><div id="yearGrid" class="year-grid"></div></section>
+
+</div>
+
+<script>
+const YEAR=2027;
+const schedule={"2027-01-01": "maria", "2027-01-02": "maria", "2027-01-03": "maria", "2027-01-04": "enrique", "2027-01-05": "enrique", "2027-01-06": "enrique", "2027-01-07": "enrique", "2027-01-08": "enrique", "2027-01-09": "enrique", "2027-01-10": "enrique", "2027-01-11": "maria", "2027-01-12": "maria", "2027-01-13": "maria", "2027-01-14": "maria", "2027-01-15": "maria", "2027-01-16": "maria", "2027-01-17": "maria", "2027-01-18": "enrique", "2027-01-19": "enrique", "2027-01-20": "enrique", "2027-01-21": "enrique", "2027-01-22": "enrique", "2027-01-23": "enrique", "2027-01-24": "enrique", "2027-01-25": "maria", "2027-01-26": "maria", "2027-01-27": "maria", "2027-01-28": "maria", "2027-01-29": "maria", "2027-01-30": "maria", "2027-01-31": "maria", "2027-02-01": "enrique", "2027-02-02": "enrique", "2027-02-03": "enrique", "2027-02-04": "enrique", "2027-02-05": "enrique", "2027-02-06": "enrique", "2027-02-07": "enrique", "2027-02-08": "maria", "2027-02-09": "maria", "2027-02-10": "maria", "2027-02-11": "maria", "2027-02-12": "maria", "2027-02-13": "maria", "2027-02-14": "maria", "2027-02-15": "enrique", "2027-02-16": "enrique", "2027-02-17": "enrique", "2027-02-18": "enrique", "2027-02-19": "enrique", "2027-02-20": "enrique", "2027-02-21": "enrique", "2027-02-22": "maria", "2027-02-23": "maria", "2027-02-24": "maria", "2027-02-25": "maria", "2027-02-26": "maria", "2027-02-27": "maria", "2027-02-28": "maria", "2027-03-01": "enrique", "2027-03-02": "enrique", "2027-03-03": "enrique", "2027-03-04": "enrique", "2027-03-05": "enrique", "2027-03-06": "enrique", "2027-03-07": "enrique", "2027-03-08": "maria", "2027-03-09": "maria", "2027-03-10": "maria", "2027-03-11": "maria", "2027-03-12": "maria", "2027-03-13": "maria", "2027-03-14": "maria", "2027-03-15": "enrique", "2027-03-16": "enrique", "2027-03-17": "enrique", "2027-03-18": "enrique", "2027-03-19": "enrique", "2027-03-20": "enrique", "2027-03-21": "enrique", "2027-03-22": "enrique", "2027-03-23": "enrique", "2027-03-24": "enrique", "2027-03-25": "enrique", "2027-03-26": "maria", "2027-03-27": "maria", "2027-03-28": "maria", "2027-03-29": "maria", "2027-03-30": "maria", "2027-03-31": "maria", "2027-04-01": "maria", "2027-04-02": "maria", "2027-04-03": "maria", "2027-04-04": "maria", "2027-04-05": "enrique", "2027-04-06": "enrique", "2027-04-07": "enrique", "2027-04-08": "enrique", "2027-04-09": "enrique", "2027-04-10": "enrique", "2027-04-11": "enrique", "2027-04-12": "maria", "2027-04-13": "maria", "2027-04-14": "maria", "2027-04-15": "maria", "2027-04-16": "maria", "2027-04-17": "maria", "2027-04-18": "maria", "2027-04-19": "enrique", "2027-04-20": "enrique", "2027-04-21": "enrique", "2027-04-22": "enrique", "2027-04-23": "enrique", "2027-04-24": "enrique", "2027-04-25": "enrique", "2027-04-26": "maria", "2027-04-27": "maria", "2027-04-28": "maria", "2027-04-29": "maria", "2027-04-30": "maria", "2027-05-01": "maria", "2027-05-02": "maria", "2027-05-03": "enrique", "2027-05-04": "enrique", "2027-05-05": "enrique", "2027-05-06": "enrique", "2027-05-07": "enrique", "2027-05-08": "enrique", "2027-05-09": "enrique", "2027-05-10": "maria", "2027-05-11": "maria", "2027-05-12": "maria", "2027-05-13": "maria", "2027-05-14": "maria", "2027-05-15": "maria", "2027-05-16": "maria", "2027-05-17": "enrique", "2027-05-18": "enrique", "2027-05-19": "enrique", "2027-05-20": "enrique", "2027-05-21": "enrique", "2027-05-22": "enrique", "2027-05-23": "enrique", "2027-05-24": "maria", "2027-05-25": "maria", "2027-05-26": "maria", "2027-05-27": "maria", "2027-05-28": "maria", "2027-05-29": "maria", "2027-05-30": "maria", "2027-05-31": "enrique", "2027-06-01": "enrique", "2027-06-02": "enrique", "2027-06-03": "enrique", "2027-06-04": "enrique", "2027-06-05": "enrique", "2027-06-06": "enrique", "2027-06-07": "maria", "2027-06-08": "maria", "2027-06-09": "maria", "2027-06-10": "maria", "2027-06-11": "maria", "2027-06-12": "maria", "2027-06-13": "maria", "2027-06-14": "enrique", "2027-06-15": "enrique", "2027-06-16": "enrique", "2027-06-17": "enrique", "2027-06-18": "enrique", "2027-06-19": "enrique", "2027-06-20": "enrique", "2027-06-21": "maria", "2027-06-22": "maria", "2027-06-23": "maria", "2027-06-24": "maria", "2027-06-25": "maria", "2027-06-26": "maria", "2027-06-27": "maria", "2027-06-28": "enrique", "2027-06-29": "enrique", "2027-06-30": "enrique", "2027-07-01": "enrique", "2027-07-02": "enrique", "2027-07-03": "enrique", "2027-07-04": "enrique", "2027-07-05": "maria", "2027-07-06": "maria", "2027-07-07": "maria", "2027-07-08": "maria", "2027-07-09": "maria", "2027-07-10": "maria", "2027-07-11": "maria", "2027-07-12": "maria", "2027-07-13": "maria", "2027-07-14": "maria", "2027-07-15": "maria", "2027-07-16": "maria", "2027-07-17": "maria", "2027-07-18": "maria", "2027-07-19": "enrique", "2027-07-20": "enrique", "2027-07-21": "enrique", "2027-07-22": "enrique", "2027-07-23": "enrique", "2027-07-24": "enrique", "2027-07-25": "enrique", "2027-07-26": "enrique", "2027-07-27": "enrique", "2027-07-28": "enrique", "2027-07-29": "enrique", "2027-07-30": "enrique", "2027-07-31": "enrique", "2027-08-01": "enrique", "2027-08-02": "maria", "2027-08-03": "maria", "2027-08-04": "maria", "2027-08-05": "maria", "2027-08-06": "maria", "2027-08-07": "maria", "2027-08-08": "maria", "2027-08-09": "maria", "2027-08-10": "maria", "2027-08-11": "maria", "2027-08-12": "maria", "2027-08-13": "maria", "2027-08-14": "maria", "2027-08-15": "maria", "2027-08-16": "enrique", "2027-08-17": "enrique", "2027-08-18": "enrique", "2027-08-19": "enrique", "2027-08-20": "enrique", "2027-08-21": "enrique", "2027-08-22": "enrique", "2027-08-23": "enrique", "2027-08-24": "enrique", "2027-08-25": "enrique", "2027-08-26": "enrique", "2027-08-27": "enrique", "2027-08-28": "enrique", "2027-08-29": "enrique", "2027-08-30": "enrique", "2027-08-31": "enrique", "2027-09-01": "enrique", "2027-09-02": "enrique", "2027-09-03": "enrique", "2027-09-04": "enrique", "2027-09-05": "enrique", "2027-09-06": "enrique", "2027-09-07": "enrique", "2027-09-08": "enrique", "2027-09-09": "enrique", "2027-09-10": "enrique", "2027-09-11": "enrique", "2027-09-12": "enrique", "2027-09-13": "maria", "2027-09-14": "maria", "2027-09-15": "maria", "2027-09-16": "maria", "2027-09-17": "maria", "2027-09-18": "maria", "2027-09-19": "maria", "2027-09-20": "enrique", "2027-09-21": "enrique", "2027-09-22": "enrique", "2027-09-23": "enrique", "2027-09-24": "enrique", "2027-09-25": "enrique", "2027-09-26": "enrique", "2027-09-27": "maria", "2027-09-28": "maria", "2027-09-29": "maria", "2027-09-30": "maria", "2027-10-01": "maria", "2027-10-02": "maria", "2027-10-03": "maria", "2027-10-04": "enrique", "2027-10-05": "enrique", "2027-10-06": "enrique", "2027-10-07": "enrique", "2027-10-08": "enrique", "2027-10-09": "enrique", "2027-10-10": "enrique", "2027-10-11": "maria", "2027-10-12": "maria", "2027-10-13": "maria", "2027-10-14": "maria", "2027-10-15": "maria", "2027-10-16": "maria", "2027-10-17": "maria", "2027-10-18": "enrique", "2027-10-19": "enrique", "2027-10-20": "enrique", "2027-10-21": "enrique", "2027-10-22": "enrique", "2027-10-23": "enrique", "2027-10-24": "enrique", "2027-10-25": "maria", "2027-10-26": "maria", "2027-10-27": "maria", "2027-10-28": "maria", "2027-10-29": "maria", "2027-10-30": "maria", "2027-10-31": "maria", "2027-11-01": "enrique", "2027-11-02": "enrique", "2027-11-03": "enrique", "2027-11-04": "enrique", "2027-11-05": "enrique", "2027-11-06": "enrique", "2027-11-07": "enrique", "2027-11-08": "maria", "2027-11-09": "maria", "2027-11-10": "maria", "2027-11-11": "maria", "2027-11-12": "maria", "2027-11-13": "maria", "2027-11-14": "maria", "2027-11-15": "enrique", "2027-11-16": "enrique", "2027-11-17": "enrique", "2027-11-18": "enrique", "2027-11-19": "enrique", "2027-11-20": "enrique", "2027-11-21": "enrique", "2027-11-22": "maria", "2027-11-23": "maria", "2027-11-24": "maria", "2027-11-25": "maria", "2027-11-26": "maria", "2027-11-27": "maria", "2027-11-28": "maria", "2027-11-29": "enrique", "2027-11-30": "enrique", "2027-12-01": "enrique", "2027-12-02": "enrique", "2027-12-03": "enrique", "2027-12-04": "enrique", "2027-12-05": "enrique", "2027-12-06": "maria", "2027-12-07": "maria", "2027-12-08": "maria", "2027-12-09": "maria", "2027-12-10": "maria", "2027-12-11": "maria", "2027-12-12": "maria", "2027-12-13": "enrique", "2027-12-14": "enrique", "2027-12-15": "enrique", "2027-12-16": "enrique", "2027-12-17": "enrique", "2027-12-18": "enrique", "2027-12-19": "enrique", "2027-12-20": "maria", "2027-12-21": "maria", "2027-12-22": "maria", "2027-12-23": "maria", "2027-12-24": "maria", "2027-12-25": "maria", "2027-12-26": "maria", "2027-12-27": "enrique", "2027-12-28": "enrique", "2027-12-29": "enrique", "2027-12-30": "enrique", "2027-12-31": "enrique"};
+const changeDays={"2027-03-25":"Cambio a medio día"};
+const holidays={"2027-01-01": "Año Nuevo", "2027-01-06": "Reyes", "2027-03-19": "San José", "2027-03-25": "Jueves Santo", "2027-03-26": "Viernes Santo", "2027-05-01": "Fiesta del Trabajo", "2027-05-15": "San Isidro", "2027-08-16": "Asunción", "2027-10-12": "Fiesta Nacional", "2027-11-01": "Todos los Santos", "2027-11-09": "Almudena", "2027-12-06": "Constitución", "2027-12-08": "Inmaculada", "2027-12-25": "Navidad"};
+const months=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const now=new Date();
+let currentMonth=now.getMonth();
+
+function key(m,d){return `${YEAR}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
+function monday(d){const x=new Date(d);const n=(x.getDay()+6)%7;x.setDate(x.getDate()-n);return x}
+
+function isCurrentWeekDate(y,m,d){
+  if(now.getFullYear()!==YEAR) return false;
+  const target=new Date(y,m,d);
+  const start=monday(now);
+  start.setHours(0,0,0,0);
+  const end=new Date(start);
+  end.setDate(start.getDate()+6);
+  end.setHours(23,59,59,999);
+  return target>=start && target<=end;
+}
+
+
+function renderMonth(){
+  document.getElementById("monthTitle").textContent=`${months[currentMonth]} 2027`;
+  const out=document.getElementById("days");out.innerHTML="";
+  const first=new Date(YEAR,currentMonth,1), offset=(first.getDay()+6)%7, count=new Date(YEAR,currentMonth+1,0).getDate();
+  for(let i=0;i<offset;i++){const e=document.createElement("div");e.className="day empty";out.appendChild(e)}
+  for(let d=1;d<=count;d++){
+    const k=key(currentMonth,d), who=schedule[k], hol=holidays[k], change=changeDays[k];
+    const e=document.createElement("div");e.className=`day ${who||""}${hol?" holiday":""}${change?" change-day":""}${isCurrentWeekDate(YEAR,currentMonth,d)?" current-week":""}`;
+    if(now.getFullYear()===YEAR&&now.getMonth()===currentMonth&&now.getDate()===d)e.classList.add("today");
+    const n=document.createElement("div");n.className="num";n.textContent=d;e.appendChild(n);
+    if(change){const c=document.createElement("div");c.className="change-label";c.textContent=change;e.appendChild(c)}
+    else if(hol){const h=document.createElement("div");h.className="holiday-name";h.textContent=hol;e.appendChild(h)}
+    else{const o=document.createElement("div");o.className="owner";o.textContent=who==="enrique"?"ENRIQUE":"MARÍA";e.appendChild(o)}
+    out.appendChild(e)
+  }
+}
+
+
+function renderYear(){
+  const root=document.getElementById("yearGrid");root.innerHTML="";
+  for(let m=0;m<12;m++){
+    const box=document.createElement("div");box.className="mini";
+    const t=document.createElement("div");t.className="mini-title";t.textContent=months[m];box.appendChild(t);
+    const g=document.createElement("div");g.className="mini-grid";
+    ["L","M","X","J","V","S","D"].forEach(x=>{const w=document.createElement("div");w.className="mwd";w.textContent=x;g.appendChild(w)});
+    const first=new Date(YEAR,m,1),off=(first.getDay()+6)%7,cnt=new Date(YEAR,m+1,0).getDate();
+    for(let i=0;i<off;i++)g.appendChild(document.createElement("div"));
+    for(let d=1;d<=cnt;d++){const k=key(m,d),x=document.createElement("div");x.className=`md ${schedule[k]||""}${holidays[k]?" holiday":""}${changeDays[k]?" change-day":""}${isCurrentWeekDate(YEAR,m,d)?" current-week":""}`;x.textContent=d;g.appendChild(x)}
+    box.appendChild(g);if(m===2){const n=document.createElement("div");n.className="mini-note";n.textContent="25 · Cambio a medio día";box.appendChild(n)}box.onclick=()=>{currentMonth=m;showMonth()};root.appendChild(box)
+  }
+}
+
+function showMonth(){document.getElementById("monthView").classList.remove("hidden");document.getElementById("yearView").classList.add("hidden");document.getElementById("bMonth").classList.add("active");document.getElementById("bYear").classList.remove("active");renderMonth()}
+function showYear(){document.getElementById("monthView").classList.add("hidden");document.getElementById("yearView").classList.remove("hidden");document.getElementById("bMonth").classList.remove("active");document.getElementById("bYear").classList.add("active");renderYear()}
+
+document.getElementById("prev").onclick=()=>{currentMonth=(currentMonth+11)%12;renderMonth()};
+document.getElementById("next").onclick=()=>{currentMonth=(currentMonth+1)%12;renderMonth()};
+document.getElementById("bMonth").onclick=()=>{currentMonth=now.getMonth();showMonth()};
+document.getElementById("bYear").onclick=showYear;
+renderYear();
+</script>
+</body>
+</html>
