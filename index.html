@@ -23,16 +23,16 @@ h1{font-size:24px;line-height:1.05;margin:0;font-weight:850;letter-spacing:-.5px
 .nav{width:42px;height:40px;border:0;border-radius:11px;background:#f3f2ee;font-size:24px}
 .month-title{font-size:17px;font-weight:850;text-transform:capitalize}
 .card{background:#fff;border-radius:18px;padding:9px 7px 10px;box-shadow:0 2px 12px #00000008}
-.weekdays,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.weekdays div{text-align:center;font-size:10px;font-weight:850;color:#8b8b8b;padding:7px 0}
-.day{min-height:67px;border-radius:11px;padding:7px 5px;display:flex;flex-direction:column;justify-content:space-between;position:relative;border:2px solid transparent}
+.weekdays,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;width:100%}
+.weekdays div{min-width:0;text-align:center;font-size:10px;font-weight:850;color:#8b8b8b;padding:7px 0}
+.day{min-width:0;min-height:67px;border-radius:11px;padding:7px 5px;display:flex;flex-direction:column;justify-content:space-between;position:relative;border:2px solid transparent}
 .day.empty{background:transparent}
 .day.enrique{background:var(--enrique)}
 .day.maria{background:var(--maria)}
 .day.today{border-color:#111}
 .num{font-size:17px;font-weight:900;width:31px;height:31px;display:flex;align-items:center;justify-content:center;border-radius:50%}
 .day.holiday .num{background:#fff;border:3px solid var(--holiday);color:#111}
-.holiday-name{font-size:8px;line-height:1.05;font-weight:850;color:#1547aa;background:#eef4ff;border-radius:5px;padding:3px 4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.holiday-name{font-size:8px;line-height:1.05;font-weight:850;color:#1547aa;background:#eef4ff;border-radius:5px;padding:3px 3px;width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
 .owner{font-size:9px;font-weight:850;opacity:.72}
 .legend{display:flex;gap:13px;flex-wrap:wrap;padding:2px 4px 0;font-size:11px;color:#555}
 .leg{display:flex;align-items:center;gap:6px}
@@ -42,9 +42,9 @@ h1{font-size:24px;line-height:1.05;margin:0;font-weight:850;letter-spacing:-.5px
 .year-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .mini{background:#fff;border-radius:14px;padding:8px;box-shadow:0 2px 10px #00000008}
 .mini-title{text-align:center;text-transform:capitalize;font-size:12px;font-weight:850;margin-bottom:6px}
-.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mini-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
 .mwd{font-size:7px;text-align:center;font-weight:800;color:#aaa}
-.md{aspect-ratio:1;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:750}
+.md{min-width:0;aspect-ratio:1;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:750}
 .md.enrique{background:var(--enrique)} .md.maria{background:var(--maria)}
 .md.holiday{border:2px solid var(--holiday);border-radius:50%}
 
@@ -58,7 +58,7 @@ h1{font-size:24px;line-height:1.05;margin:0;font-weight:850;letter-spacing:-.5px
 .change-label{
   font-size:8px;line-height:1.05;font-weight:900;color:#4a3a00;
   background:#fff6bf;border-radius:5px;padding:3px 4px;
-  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:normal;text-align:center;
 }
 .md.current-week{
   box-shadow:0 0 0 2px #111 inset;
@@ -81,13 +81,26 @@ h1{font-size:24px;line-height:1.05;margin:0;font-weight:850;letter-spacing:-.5px
 
 .hidden{display:none!important}
 @media(max-width:620px){
-  .app{max-width:none;padding:10px 8px calc(28px + env(safe-area-inset-bottom));padding-top:calc(10px + env(safe-area-inset-top))}
+  .app{max-width:none;width:100%;padding:10px 6px calc(28px + env(safe-area-inset-bottom));padding-top:calc(10px + env(safe-area-inset-top));overflow-x:hidden}
   h1{font-size:21px} .header{margin-bottom:10px}
   .toggle button{padding:7px 10px;font-size:12px}
-      .day{min-height:61px;padding:5px 4px;border-radius:9px}
-  .num{font-size:16px;width:29px;height:29px}
-  .owner{display:none} .holiday-name{font-size:7px;padding:2px 3px}
-  .year-grid{grid-template-columns:repeat(2,1fr);gap:7px}
+  .card{padding:8px 4px 9px;border-radius:16px}
+  .weekdays,.days{gap:3px}
+  .day{min-width:0;min-height:61px;padding:5px 3px;border-radius:8px}
+  .num{font-size:16px;width:27px;height:27px}
+  .owner{display:none}
+  .holiday-name{font-size:6px;line-height:1.05;padding:2px 1px;white-space:normal}
+  .change-label{font-size:6px;line-height:1.05;padding:2px 1px;white-space:normal;text-align:center}
+  .year-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .mini{min-width:0;padding:6px}
+}
+@media(max-width:360px){
+  .app{padding-left:4px;padding-right:4px}
+  .card{padding-left:3px;padding-right:3px}
+  .weekdays,.days{gap:2px}
+  .day{min-height:58px;padding:4px 2px;border-radius:7px}
+  .num{font-size:15px;width:25px;height:25px}
+  .holiday-name,.change-label{font-size:5.5px;padding:2px 1px}
 }
 </style>
 </head>
