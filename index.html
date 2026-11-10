@@ -136,10 +136,16 @@ h1{font-size:23px;line-height:1.05;margin:0;font-weight:850;letter-spacing:-.4px
   </div>
 </section>
 
-<section id="proposalsPanel" class="panel hidden">
-  <h2>Propuestas</h2>
-  <div id="proposalsList"></div>
-</section>
+</div>
+
+<div id="proposalsModal" class="modalback">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+      <h2 style="margin:0">Propuestas</h2>
+      <button id="closeProposals" class="btn">Cerrar</button>
+    </div>
+    <div id="proposalsList"></div>
+  </div>
 </div>
 
 <div id="loginModal" class="modalback">
@@ -221,7 +227,7 @@ function updateAuthUI(){
   if(session)document.getElementById("logoutBtn").textContent=`Salir · ${currentUserName()}`;
   if(!session){
     selected.clear();
-    document.getElementById("proposalsPanel").classList.add("hidden");
+    openModal("proposalsModal",false);
   }
   updateSelectionBar();
 }
@@ -358,20 +364,22 @@ async function sendProposal(){
   updateSelectionBar();
   renderMonth();
   await loadProposals();
-  document.getElementById("proposalsPanel").classList.remove("hidden")
+  openModal("proposalsModal",true)
 }
 
 async function reviewProposal(id,decision){
   const {error}=await sb.rpc("review_change_proposal",{p_proposal_id:id,p_decision:decision});
   if(error){alert(error.message);return}
   await loadCalendar();
-  await loadProposals()
+  await loadProposals();
+  openModal("proposalsModal",false);
 }
 
 async function cancelProposal(id){
   const {error}=await sb.rpc("cancel_change_proposal",{p_proposal_id:id});
   if(error){alert(error.message);return}
-  await loadProposals()
+  await loadProposals();
+  openModal("proposalsModal",false);
 }
 
 document.getElementById("yearBtn").onclick=showYear;
@@ -426,10 +434,12 @@ document.getElementById("logoutBtn").onclick=async()=>{
   updateAuthUI();showYear()
 };
 
-document.getElementById("pendingBtn").onclick=()=>{
-  document.getElementById("proposalsPanel").classList.toggle("hidden");
-  if(!document.getElementById("proposalsPanel").classList.contains("hidden"))loadProposals()
+document.getElementById("pendingBtn").onclick=async()=>{
+  await loadProposals();
+  openModal("proposalsModal",true);
 };
+
+document.getElementById("closeProposals").onclick=()=>openModal("proposalsModal",false);
 
 render();
 showYear();
