@@ -4,201 +4,437 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f6f5f1">
-<title>Calendario de las niñas · 2027</title>
+<title>Calendario niñas 2027</title>
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
-  --bg:#f6f5f1;--card:#fff;--text:#1f2328;--muted:#777;
-  --enrique:#f5a23a;--maria:#ef86b7;--holiday:#246bfd;--line:#eceae4;
+:root {
+  --bg:#f6f5f1; --card:#fff; --text:#202124; --muted:#747474;
+  --enrique:#f5a23a; --maria:#ef86b7; --blue:#246bfd; --yellow:#f7df62;
+  --line:#e9e7e1; --danger:#b3261e;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-.app{max-width:760px;margin:auto;padding:14px 10px 36px}
-.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
-h1{font-size:24px;line-height:1.05;margin:0;font-weight:850;letter-spacing:-.5px}
-.subtitle{font-size:12px;color:var(--muted);margin-top:5px}
-.toggle{display:flex;background:#e9e7e1;border-radius:13px;padding:3px}
-.toggle button{border:0;background:transparent;padding:8px 12px;border-radius:10px;font-weight:750;color:#666}
-.toggle button.active{background:#fff;color:#111;box-shadow:0 1px 5px #0001}
-.controls{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:16px;padding:8px 9px;margin-bottom:9px;box-shadow:0 2px 12px #00000008}
-.nav{width:42px;height:40px;border:0;border-radius:11px;background:#f3f2ee;font-size:24px}
-.month-title{font-size:17px;font-weight:850;text-transform:capitalize}
-.card{background:#fff;border-radius:18px;padding:9px 7px 10px;box-shadow:0 2px 12px #00000008}
-.weekdays,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;width:100%}
-.weekdays div{min-width:0;text-align:center;font-size:10px;font-weight:850;color:#8b8b8b;padding:7px 0}
-.day{min-width:0;min-height:67px;border-radius:11px;padding:7px 5px;display:flex;flex-direction:column;justify-content:space-between;position:relative;border:2px solid transparent}
-.day.empty{background:transparent}
-.day.enrique{background:var(--enrique)}
-.day.maria{background:var(--maria)}
-.day.today{border-color:#111}
-.num{font-size:17px;font-weight:900;width:31px;height:31px;display:flex;align-items:center;justify-content:center;border-radius:50%}
-.day.holiday .num{background:#fff;border:3px solid var(--holiday);color:#111}
-.holiday-name{font-size:8px;line-height:1.05;font-weight:850;color:#1547aa;background:#eef4ff;border-radius:5px;padding:3px 3px;width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
-.owner{font-size:9px;font-weight:850;opacity:.72}
-.legend{display:flex;gap:13px;flex-wrap:wrap;padding:2px 4px 0;font-size:11px;color:#555}
-.leg{display:flex;align-items:center;gap:6px}
+.app{max-width:760px;margin:auto;padding:12px 10px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+h1{font-size:23px;line-height:1.05;margin:0;font-weight:850;letter-spacing:-.4px}
+.actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.btn{border:0;border-radius:11px;padding:9px 12px;font-weight:800;background:#ebe9e3;color:#222;cursor:pointer}
+.btn.primary{background:#111;color:#fff}
+.btn.blue{background:var(--blue);color:#fff}
+.btn.danger{background:#fde7e5;color:var(--danger)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#d92727;color:#fff;font-size:11px;font-weight:900}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:#555;margin:4px 2px 10px}
+.leg{display:flex;align-items:center;gap:5px}
 .sw{width:12px;height:12px;border-radius:4px}
-.ring{width:16px;height:16px;border-radius:50%;border:3px solid var(--holiday);background:#fff}
-.note{font-size:10px;color:#888;text-align:left;margin:6px 4px 10px}
-.year-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.mini{background:#fff;border-radius:14px;padding:8px;box-shadow:0 2px 10px #00000008}
-.mini-title{text-align:center;text-transform:capitalize;font-size:12px;font-weight:850;margin-bottom:6px}
+.ring{width:15px;height:15px;border:3px solid var(--blue);border-radius:50%}
+.toolbar{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:14px;padding:7px;margin-bottom:9px}
+.toggle{display:flex;background:#eceae5;border-radius:10px;padding:2px}
+.toggle button{border:0;background:transparent;border-radius:8px;padding:7px 10px;font-weight:800}
+.toggle button.active{background:#fff}
+.month-nav{display:flex;align-items:center;gap:8px}
+.nav{border:0;width:38px;height:38px;border-radius:10px;background:#f1f0ec;font-size:21px}
+.month-title{font-weight:850;min-width:120px;text-align:center;text-transform:capitalize}
+.selectionbar{display:none;position:sticky;top:6px;z-index:5;background:#111;color:#fff;border-radius:14px;padding:10px 12px;margin-bottom:9px;align-items:center;justify-content:space-between;gap:8px}
+.selectionbar.show{display:flex}
+.selectionbar strong{font-size:14px}
+.card{background:#fff;border-radius:17px;padding:8px 6px 10px}
+.weekdays,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.weekdays div{text-align:center;font-size:9px;font-weight:850;color:#8a8a8a;padding:5px 0}
+.day{appearance:none;border:2px solid transparent;min-width:0;min-height:66px;border-radius:10px;padding:6px 4px;position:relative;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;color:#111;text-align:left}
+.day.enrique{background:var(--enrique)} .day.maria{background:var(--maria)} .day.empty{background:transparent}
+.day.current-week{box-shadow:0 0 0 2px #111 inset}
+.day.selected{border-color:var(--blue);box-shadow:0 0 0 2px #fff inset}
+.day.change-day{background:var(--yellow)!important}
+.num{font-size:16px;font-weight:900;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.day.holiday .num{background:#fff;border:3px solid var(--blue)}
+.smalllabel{font-size:7px;font-weight:900;line-height:1.05;white-space:normal;overflow-wrap:anywhere;background:#ffffffdd;border-radius:4px;padding:2px 3px;max-width:100%}
+.selectmark{position:absolute;right:4px;top:4px;background:var(--blue);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+.year-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mini{background:#fff;border-radius:13px;padding:7px;cursor:pointer}
+.mini-title{text-align:center;font-size:12px;font-weight:850;text-transform:capitalize;margin-bottom:5px}
 .mini-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
-.mwd{font-size:7px;text-align:center;font-weight:800;color:#aaa}
-.md{min-width:0;aspect-ratio:1;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:750}
-.md.enrique{background:var(--enrique)} .md.maria{background:var(--maria)}
-.md.holiday{border:2px solid var(--holiday);border-radius:50%}
-
-.day.current-week{
-  box-shadow:0 0 0 3px #111 inset;
-}
-.day.change-day{
-  background:#f7df62 !important;
-  color:#111;
-}
-.change-label{
-  font-size:8px;line-height:1.05;font-weight:900;color:#4a3a00;
-  background:#fff6bf;border-radius:5px;padding:3px 4px;
-  width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:normal;text-align:center;
-}
-.md.current-week{
-  box-shadow:0 0 0 2px #111 inset;
-}
-.md.change-day{
-  background:#f7df62 !important;
-  color:#111;
-}
-.mini-note{
-  margin-top:5px;
-  font-size:8px;
-  line-height:1.15;
-  color:#6a5a00;
-  font-weight:800;
-  text-align:center;
-  background:#fff6bf;
-  border-radius:6px;
-  padding:3px 4px;
-}
-
+.mwd{font-size:7px;text-align:center;color:#aaa;font-weight:800}
+.md{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;border-radius:3px;min-width:0}
+.md.enrique{background:var(--enrique)} .md.maria{background:var(--maria)} .md.current-week{box-shadow:0 0 0 2px #111 inset}
+.md.holiday{border:2px solid var(--blue);border-radius:50%} .md.change-day{background:var(--yellow)!important}
+.panel{background:#fff;border-radius:16px;padding:14px;margin:10px 0}
+.panel h2{font-size:17px;margin:0 0 10px}
+.proposal{border-top:1px solid var(--line);padding:11px 0}
+.proposal:first-of-type{border-top:0}
+.proposal-title{font-weight:850;font-size:14px}
+.muted{color:var(--muted);font-size:12px}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0}
+.chip{background:#f0efeb;border-radius:8px;padding:5px 7px;font-size:11px;font-weight:750}
+.modalback{display:none;position:fixed;inset:0;background:#0006;z-index:20;padding:18px;align-items:flex-end;justify-content:center}
+.modalback.show{display:flex}
+.modal{background:#fff;width:min(520px,100%);max-height:85vh;overflow:auto;border-radius:20px;padding:16px}
+.modal h2{margin:0 0 10px;font-size:19px}
+.userchoice{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.userchoice button{border:2px solid transparent;border-radius:14px;padding:14px 10px;font-weight:850;font-size:16px}
+.userchoice button.enrique{background:var(--enrique)} .userchoice button.maria{background:var(--maria)}
+.userchoice button.active{border-color:#111}
+.field{display:flex;flex-direction:column;gap:5px;margin:10px 0}
+.field input{font-size:16px;padding:12px;border:1px solid #ccc;border-radius:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1}
 .hidden{display:none!important}
 @media(max-width:620px){
-  .app{max-width:none;width:100%;padding:10px 6px calc(28px + env(safe-area-inset-bottom));padding-top:calc(10px + env(safe-area-inset-top));overflow-x:hidden}
-  h1{font-size:21px} .header{margin-bottom:10px}
-  .toggle button{padding:7px 10px;font-size:12px}
-  .card{padding:8px 4px 9px;border-radius:16px}
+  .app{padding:9px 7px 28px}
+  h1{font-size:19px}
+  .year-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .day{min-height:58px;padding:5px 3px}
   .weekdays,.days{gap:3px}
-  .day{min-width:0;min-height:61px;padding:5px 3px;border-radius:8px}
-  .num{font-size:16px;width:27px;height:27px}
-  .owner{display:none}
-  .holiday-name{font-size:6px;line-height:1.05;padding:2px 1px;white-space:normal}
-  .change-label{font-size:6px;line-height:1.05;padding:2px 1px;white-space:normal;text-align:center}
-  .year-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-  .mini{min-width:0;padding:6px}
-}
-@media(max-width:360px){
-  .app{padding-left:4px;padding-right:4px}
-  .card{padding-left:3px;padding-right:3px}
-  .weekdays,.days{gap:2px}
-  .day{min-height:58px;padding:4px 2px;border-radius:7px}
-  .num{font-size:15px;width:25px;height:25px}
-  .holiday-name,.change-label{font-size:5.5px;padding:2px 1px}
+  .toolbar{padding:5px}
+  .btn{padding:8px 9px;font-size:12px}
 }
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="header">
-    <div><h1>Calendario niñas 2027</h1></div>
-    <div class="toggle"><button id="bMonth">Mes</button><button id="bYear" class="active">Año</button></div>
-  </header>
-
-  <div class="legend">
-    <div class="leg"><span class="sw" style="background:var(--enrique)"></span>Enrique</div>
-    <div class="leg"><span class="sw" style="background:var(--maria)"></span>María</div>
-    <div class="leg"><span class="ring"></span>Festivo en Madrid</div>
-    <div class="leg"><span class="sw" style="background:#f7df62"></span>Cambio a medio día</div>
-    <div class="leg"><span class="sw" style="background:white;border:2px solid #111"></span>Semana actual</div>
+<header>
+  <h1>Calendario niñas 2027</h1>
+  <div class="actions">
+    <button id="pendingBtn" class="btn hidden">Pendientes <span id="pendingCount" class="badge">0</span></button>
+    <button id="loginBtn" class="btn">Editar</button>
+    <button id="logoutBtn" class="btn hidden">Salir</button>
   </div>
-  <div class="note">Los festivos mantienen el color del turno. El amarillo se reserva para el cambio especial del 25 de marzo.</div>
+</header>
 
+<div class="legend">
+  <span class="leg"><span class="sw" style="background:var(--enrique)"></span>Enrique</span>
+  <span class="leg"><span class="sw" style="background:var(--maria)"></span>María</span>
+  <span class="leg"><span class="ring"></span>Festivo</span>
+  <span class="leg"><span class="sw" style="background:var(--yellow)"></span>Cambio a medio día</span>
+  <span class="leg"><span class="sw" style="background:white;border:2px solid #111"></span>Semana actual</span>
+</div>
 
-  <section id="monthView" class="hidden">
-    <div class="controls"><button id="prev" class="nav">‹</button><div id="monthTitle" class="month-title"></div><button id="next" class="nav">›</button></div>
-    <div class="card">
-      <div class="weekdays"><div>LU</div><div>MA</div><div>MI</div><div>JU</div><div>VI</div><div>SÁ</div><div>DO</div></div>
-      <div id="days" class="days"></div>
+<div class="toolbar">
+  <div class="toggle"><button id="yearBtn" class="active">Año</button><button id="monthBtn">Mes</button></div>
+  <div id="monthNav" class="month-nav hidden">
+    <button id="prev" class="nav">‹</button>
+    <div id="monthTitle" class="month-title"></div>
+    <button id="next" class="nav">›</button>
+  </div>
+</div>
+
+<div id="selectionBar" class="selectionbar">
+  <strong><span id="selectedCount">0</span> días seleccionados</strong>
+  <div class="actions">
+    <button id="clearSel" class="btn">Cancelar</button>
+    <button id="reviewSel" class="btn blue">Revisar</button>
+  </div>
+</div>
+
+<section id="yearView"><div id="yearGrid" class="year-grid"></div></section>
+<section id="monthView" class="hidden">
+  <div class="card">
+    <div class="weekdays"><div>LU</div><div>MA</div><div>MI</div><div>JU</div><div>VI</div><div>SÁ</div><div>DO</div></div>
+    <div id="days" class="days"></div>
+  </div>
+</section>
+
+<section id="proposalsPanel" class="panel hidden">
+  <h2>Propuestas</h2>
+  <div id="proposalsList"></div>
+</section>
+</div>
+
+<div id="loginModal" class="modalback">
+  <div class="modal">
+    <h2>Acceso para editar</h2>
+    <div class="userchoice">
+      <button id="chooseEnrique" class="enrique">Enrique</button>
+      <button id="chooseMaria" class="maria">María</button>
     </div>
-  </section>
+    <div class="field">
+      <label>Contraseña</label>
+      <input id="passInput" type="password" autocomplete="current-password">
+    </div>
+    <div id="loginError" class="muted"></div>
+    <div class="row">
+      <button id="closeLogin" class="btn">Cancelar</button>
+      <button id="doLogin" class="btn primary">Entrar</button>
+    </div>
+  </div>
+</div>
 
-  <section id="yearView"><div id="yearGrid" class="year-grid"></div></section>
-
+<div id="reviewModal" class="modalback">
+  <div class="modal">
+    <h2>Revisar propuesta</h2>
+    <div id="reviewList" class="chips"></div>
+    <p class="muted">Se enviará como una única propuesta. La otra persona deberá aceptar o rechazar todos los días juntos.</p>
+    <div class="row">
+      <button id="closeReview" class="btn">Volver</button>
+      <button id="sendProposal" class="btn blue">Enviar propuesta</button>
+    </div>
+  </div>
 </div>
 
 <script>
+const SUPABASE_URL="https://dnjgfrzmraqvdfluvyzc.supabase.co";
+const SUPABASE_KEY="sb_publishable_gQIQTgGdFaczHKK-c6aLxw_QOSqHFmn";
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
 const YEAR=2027;
-const schedule={"2027-01-01":"maria","2027-01-02":"maria","2027-01-03":"maria","2027-01-04":"enrique","2027-01-05":"enrique","2027-01-06":"enrique","2027-01-07":"enrique","2027-01-08":"enrique","2027-01-09":"enrique","2027-01-10":"enrique","2027-01-11":"maria","2027-01-12":"maria","2027-01-13":"maria","2027-01-14":"maria","2027-01-15":"maria","2027-01-16":"maria","2027-01-17":"maria","2027-01-18":"enrique","2027-01-19":"enrique","2027-01-20":"enrique","2027-01-21":"enrique","2027-01-22":"enrique","2027-01-23":"enrique","2027-01-24":"enrique","2027-01-25":"maria","2027-01-26":"maria","2027-01-27":"maria","2027-01-28":"maria","2027-01-29":"maria","2027-01-30":"maria","2027-01-31":"maria","2027-02-01":"enrique","2027-02-02":"enrique","2027-02-03":"enrique","2027-02-04":"enrique","2027-02-05":"enrique","2027-02-06":"enrique","2027-02-07":"enrique","2027-02-08":"maria","2027-02-09":"maria","2027-02-10":"maria","2027-02-11":"maria","2027-02-12":"maria","2027-02-13":"maria","2027-02-14":"maria","2027-02-15":"enrique","2027-02-16":"enrique","2027-02-17":"enrique","2027-02-18":"enrique","2027-02-19":"enrique","2027-02-20":"enrique","2027-02-21":"enrique","2027-02-22":"maria","2027-02-23":"maria","2027-02-24":"maria","2027-02-25":"maria","2027-02-26":"maria","2027-02-27":"maria","2027-02-28":"maria","2027-03-01":"enrique","2027-03-02":"enrique","2027-03-03":"enrique","2027-03-04":"enrique","2027-03-05":"enrique","2027-03-06":"enrique","2027-03-07":"enrique","2027-03-08":"maria","2027-03-09":"maria","2027-03-10":"maria","2027-03-11":"maria","2027-03-12":"maria","2027-03-13":"maria","2027-03-14":"maria","2027-03-15":"enrique","2027-03-16":"enrique","2027-03-17":"enrique","2027-03-18":"enrique","2027-03-19":"enrique","2027-03-20":"enrique","2027-03-21":"enrique","2027-03-22":"enrique","2027-03-23":"enrique","2027-03-24":"enrique","2027-03-25":"enrique","2027-03-26":"maria","2027-03-27":"maria","2027-03-28":"maria","2027-03-29":"maria","2027-03-30":"maria","2027-03-31":"maria","2027-04-01":"maria","2027-04-02":"maria","2027-04-03":"maria","2027-04-04":"maria","2027-04-05":"enrique","2027-04-06":"enrique","2027-04-07":"enrique","2027-04-08":"enrique","2027-04-09":"enrique","2027-04-10":"enrique","2027-04-11":"enrique","2027-04-12":"maria","2027-04-13":"maria","2027-04-14":"maria","2027-04-15":"maria","2027-04-16":"maria","2027-04-17":"maria","2027-04-18":"maria","2027-04-19":"enrique","2027-04-20":"enrique","2027-04-21":"enrique","2027-04-22":"enrique","2027-04-23":"enrique","2027-04-24":"enrique","2027-04-25":"enrique","2027-04-26":"maria","2027-04-27":"maria","2027-04-28":"maria","2027-04-29":"maria","2027-04-30":"maria","2027-05-01":"maria","2027-05-02":"maria","2027-05-03":"enrique","2027-05-04":"enrique","2027-05-05":"enrique","2027-05-06":"enrique","2027-05-07":"enrique","2027-05-08":"enrique","2027-05-09":"enrique","2027-05-10":"maria","2027-05-11":"maria","2027-05-12":"maria","2027-05-13":"maria","2027-05-14":"maria","2027-05-15":"maria","2027-05-16":"maria","2027-05-17":"enrique","2027-05-18":"enrique","2027-05-19":"enrique","2027-05-20":"enrique","2027-05-21":"enrique","2027-05-22":"enrique","2027-05-23":"enrique","2027-05-24":"maria","2027-05-25":"maria","2027-05-26":"maria","2027-05-27":"maria","2027-05-28":"maria","2027-05-29":"maria","2027-05-30":"maria","2027-05-31":"enrique","2027-06-01":"enrique","2027-06-02":"enrique","2027-06-03":"enrique","2027-06-04":"enrique","2027-06-05":"enrique","2027-06-06":"enrique","2027-06-07":"maria","2027-06-08":"maria","2027-06-09":"maria","2027-06-10":"maria","2027-06-11":"maria","2027-06-12":"maria","2027-06-13":"maria","2027-06-14":"enrique","2027-06-15":"enrique","2027-06-16":"enrique","2027-06-17":"enrique","2027-06-18":"enrique","2027-06-19":"enrique","2027-06-20":"enrique","2027-06-21":"maria","2027-06-22":"maria","2027-06-23":"maria","2027-06-24":"maria","2027-06-25":"maria","2027-06-26":"maria","2027-06-27":"maria","2027-06-28":"enrique","2027-06-29":"enrique","2027-06-30":"enrique","2027-07-01":"maria","2027-07-02":"maria","2027-07-03":"maria","2027-07-04":"maria","2027-07-05":"maria","2027-07-06":"maria","2027-07-07":"maria","2027-07-08":"maria","2027-07-09":"maria","2027-07-10":"maria","2027-07-11":"maria","2027-07-12":"maria","2027-07-13":"maria","2027-07-14":"maria","2027-07-15":"maria","2027-07-16":"enrique","2027-07-17":"enrique","2027-07-18":"enrique","2027-07-19":"enrique","2027-07-20":"enrique","2027-07-21":"enrique","2027-07-22":"enrique","2027-07-23":"enrique","2027-07-24":"enrique","2027-07-25":"enrique","2027-07-26":"enrique","2027-07-27":"enrique","2027-07-28":"enrique","2027-07-29":"enrique","2027-07-30":"enrique","2027-07-31":"enrique","2027-08-01":"maria","2027-08-02":"maria","2027-08-03":"maria","2027-08-04":"maria","2027-08-05":"maria","2027-08-06":"maria","2027-08-07":"maria","2027-08-08":"maria","2027-08-09":"maria","2027-08-10":"maria","2027-08-11":"maria","2027-08-12":"maria","2027-08-13":"maria","2027-08-14":"maria","2027-08-15":"maria","2027-08-16":"enrique","2027-08-17":"enrique","2027-08-18":"enrique","2027-08-19":"enrique","2027-08-20":"enrique","2027-08-21":"enrique","2027-08-22":"enrique","2027-08-23":"enrique","2027-08-24":"enrique","2027-08-25":"enrique","2027-08-26":"enrique","2027-08-27":"enrique","2027-08-28":"enrique","2027-08-29":"enrique","2027-08-30":"enrique","2027-08-31":"enrique","2027-09-01":"maria","2027-09-02":"maria","2027-09-03":"maria","2027-09-04":"maria","2027-09-05":"maria","2027-09-06":"enrique","2027-09-07":"enrique","2027-09-08":"enrique","2027-09-09":"enrique","2027-09-10":"enrique","2027-09-11":"enrique","2027-09-12":"enrique","2027-09-13":"maria","2027-09-14":"maria","2027-09-15":"maria","2027-09-16":"maria","2027-09-17":"maria","2027-09-18":"maria","2027-09-19":"maria","2027-09-20":"enrique","2027-09-21":"enrique","2027-09-22":"enrique","2027-09-23":"enrique","2027-09-24":"enrique","2027-09-25":"enrique","2027-09-26":"enrique","2027-09-27":"maria","2027-09-28":"maria","2027-09-29":"maria","2027-09-30":"maria","2027-10-01":"maria","2027-10-02":"maria","2027-10-03":"maria","2027-10-04":"enrique","2027-10-05":"enrique","2027-10-06":"enrique","2027-10-07":"enrique","2027-10-08":"enrique","2027-10-09":"enrique","2027-10-10":"enrique","2027-10-11":"maria","2027-10-12":"maria","2027-10-13":"maria","2027-10-14":"maria","2027-10-15":"maria","2027-10-16":"maria","2027-10-17":"maria","2027-10-18":"enrique","2027-10-19":"enrique","2027-10-20":"enrique","2027-10-21":"enrique","2027-10-22":"enrique","2027-10-23":"enrique","2027-10-24":"enrique","2027-10-25":"maria","2027-10-26":"maria","2027-10-27":"maria","2027-10-28":"maria","2027-10-29":"maria","2027-10-30":"maria","2027-10-31":"maria","2027-11-01":"enrique","2027-11-02":"enrique","2027-11-03":"enrique","2027-11-04":"enrique","2027-11-05":"enrique","2027-11-06":"enrique","2027-11-07":"enrique","2027-11-08":"maria","2027-11-09":"maria","2027-11-10":"maria","2027-11-11":"maria","2027-11-12":"maria","2027-11-13":"maria","2027-11-14":"maria","2027-11-15":"enrique","2027-11-16":"enrique","2027-11-17":"enrique","2027-11-18":"enrique","2027-11-19":"enrique","2027-11-20":"enrique","2027-11-21":"enrique","2027-11-22":"maria","2027-11-23":"maria","2027-11-24":"maria","2027-11-25":"maria","2027-11-26":"maria","2027-11-27":"maria","2027-11-28":"maria","2027-11-29":"enrique","2027-11-30":"enrique","2027-12-01":"enrique","2027-12-02":"enrique","2027-12-03":"enrique","2027-12-04":"enrique","2027-12-05":"enrique","2027-12-06":"maria","2027-12-07":"maria","2027-12-08":"maria","2027-12-09":"maria","2027-12-10":"maria","2027-12-11":"maria","2027-12-12":"maria","2027-12-13":"enrique","2027-12-14":"enrique","2027-12-15":"enrique","2027-12-16":"enrique","2027-12-17":"enrique","2027-12-18":"enrique","2027-12-19":"enrique","2027-12-20":"maria","2027-12-21":"maria","2027-12-22":"maria","2027-12-23":"maria","2027-12-24":"maria","2027-12-25":"maria","2027-12-26":"maria","2027-12-27":"enrique","2027-12-28":"enrique","2027-12-29":"enrique","2027-12-30":"enrique","2027-12-31":"enrique"};
+const fallback={"2027-01-01":"maria","2027-01-02":"maria","2027-01-03":"maria","2027-01-04":"enrique","2027-01-05":"enrique","2027-01-06":"enrique","2027-01-07":"enrique","2027-01-08":"enrique","2027-01-09":"enrique","2027-01-10":"enrique","2027-01-11":"maria","2027-01-12":"maria","2027-01-13":"maria","2027-01-14":"maria","2027-01-15":"maria","2027-01-16":"maria","2027-01-17":"maria","2027-01-18":"enrique","2027-01-19":"enrique","2027-01-20":"enrique","2027-01-21":"enrique","2027-01-22":"enrique","2027-01-23":"enrique","2027-01-24":"enrique","2027-01-25":"maria","2027-01-26":"maria","2027-01-27":"maria","2027-01-28":"maria","2027-01-29":"maria","2027-01-30":"maria","2027-01-31":"maria","2027-02-01":"enrique","2027-02-02":"enrique","2027-02-03":"enrique","2027-02-04":"enrique","2027-02-05":"enrique","2027-02-06":"enrique","2027-02-07":"enrique","2027-02-08":"maria","2027-02-09":"maria","2027-02-10":"maria","2027-02-11":"maria","2027-02-12":"maria","2027-02-13":"maria","2027-02-14":"maria","2027-02-15":"enrique","2027-02-16":"enrique","2027-02-17":"enrique","2027-02-18":"enrique","2027-02-19":"enrique","2027-02-20":"enrique","2027-02-21":"enrique","2027-02-22":"maria","2027-02-23":"maria","2027-02-24":"maria","2027-02-25":"maria","2027-02-26":"maria","2027-02-27":"maria","2027-02-28":"maria","2027-03-01":"enrique","2027-03-02":"enrique","2027-03-03":"enrique","2027-03-04":"enrique","2027-03-05":"enrique","2027-03-06":"enrique","2027-03-07":"enrique","2027-03-08":"maria","2027-03-09":"maria","2027-03-10":"maria","2027-03-11":"maria","2027-03-12":"maria","2027-03-13":"maria","2027-03-14":"maria","2027-03-15":"enrique","2027-03-16":"enrique","2027-03-17":"enrique","2027-03-18":"enrique","2027-03-19":"enrique","2027-03-20":"enrique","2027-03-21":"enrique","2027-03-22":"enrique","2027-03-23":"enrique","2027-03-24":"enrique","2027-03-25":"enrique","2027-03-26":"maria","2027-03-27":"maria","2027-03-28":"maria","2027-03-29":"maria","2027-03-30":"maria","2027-03-31":"maria","2027-04-01":"maria","2027-04-02":"maria","2027-04-03":"maria","2027-04-04":"maria","2027-04-05":"enrique","2027-04-06":"enrique","2027-04-07":"enrique","2027-04-08":"enrique","2027-04-09":"enrique","2027-04-10":"enrique","2027-04-11":"enrique","2027-04-12":"maria","2027-04-13":"maria","2027-04-14":"maria","2027-04-15":"maria","2027-04-16":"maria","2027-04-17":"maria","2027-04-18":"maria","2027-04-19":"enrique","2027-04-20":"enrique","2027-04-21":"enrique","2027-04-22":"enrique","2027-04-23":"enrique","2027-04-24":"enrique","2027-04-25":"enrique","2027-04-26":"maria","2027-04-27":"maria","2027-04-28":"maria","2027-04-29":"maria","2027-04-30":"maria","2027-05-01":"maria","2027-05-02":"maria","2027-05-03":"enrique","2027-05-04":"enrique","2027-05-05":"enrique","2027-05-06":"enrique","2027-05-07":"enrique","2027-05-08":"enrique","2027-05-09":"enrique","2027-05-10":"maria","2027-05-11":"maria","2027-05-12":"maria","2027-05-13":"maria","2027-05-14":"maria","2027-05-15":"maria","2027-05-16":"maria","2027-05-17":"enrique","2027-05-18":"enrique","2027-05-19":"enrique","2027-05-20":"enrique","2027-05-21":"enrique","2027-05-22":"enrique","2027-05-23":"enrique","2027-05-24":"maria","2027-05-25":"maria","2027-05-26":"maria","2027-05-27":"maria","2027-05-28":"maria","2027-05-29":"maria","2027-05-30":"maria","2027-05-31":"enrique","2027-06-01":"enrique","2027-06-02":"enrique","2027-06-03":"enrique","2027-06-04":"enrique","2027-06-05":"enrique","2027-06-06":"enrique","2027-06-07":"maria","2027-06-08":"maria","2027-06-09":"maria","2027-06-10":"maria","2027-06-11":"maria","2027-06-12":"maria","2027-06-13":"maria","2027-06-14":"enrique","2027-06-15":"enrique","2027-06-16":"enrique","2027-06-17":"enrique","2027-06-18":"enrique","2027-06-19":"enrique","2027-06-20":"enrique","2027-06-21":"maria","2027-06-22":"maria","2027-06-23":"maria","2027-06-24":"maria","2027-06-25":"maria","2027-06-26":"maria","2027-06-27":"maria","2027-06-28":"enrique","2027-06-29":"enrique","2027-06-30":"enrique","2027-07-01":"maria","2027-07-02":"maria","2027-07-03":"maria","2027-07-04":"maria","2027-07-05":"maria","2027-07-06":"maria","2027-07-07":"maria","2027-07-08":"maria","2027-07-09":"maria","2027-07-10":"maria","2027-07-11":"maria","2027-07-12":"maria","2027-07-13":"maria","2027-07-14":"maria","2027-07-15":"maria","2027-07-16":"enrique","2027-07-17":"enrique","2027-07-18":"enrique","2027-07-19":"enrique","2027-07-20":"enrique","2027-07-21":"enrique","2027-07-22":"enrique","2027-07-23":"enrique","2027-07-24":"enrique","2027-07-25":"enrique","2027-07-26":"enrique","2027-07-27":"enrique","2027-07-28":"enrique","2027-07-29":"enrique","2027-07-30":"enrique","2027-07-31":"enrique","2027-08-01":"maria","2027-08-02":"maria","2027-08-03":"maria","2027-08-04":"maria","2027-08-05":"maria","2027-08-06":"maria","2027-08-07":"maria","2027-08-08":"maria","2027-08-09":"maria","2027-08-10":"maria","2027-08-11":"maria","2027-08-12":"maria","2027-08-13":"maria","2027-08-14":"maria","2027-08-15":"maria","2027-08-16":"enrique","2027-08-17":"enrique","2027-08-18":"enrique","2027-08-19":"enrique","2027-08-20":"enrique","2027-08-21":"enrique","2027-08-22":"enrique","2027-08-23":"enrique","2027-08-24":"enrique","2027-08-25":"enrique","2027-08-26":"enrique","2027-08-27":"enrique","2027-08-28":"enrique","2027-08-29":"enrique","2027-08-30":"enrique","2027-08-31":"enrique","2027-09-01":"maria","2027-09-02":"maria","2027-09-03":"maria","2027-09-04":"maria","2027-09-05":"maria","2027-09-06":"enrique","2027-09-07":"enrique","2027-09-08":"enrique","2027-09-09":"enrique","2027-09-10":"enrique","2027-09-11":"enrique","2027-09-12":"enrique","2027-09-13":"maria","2027-09-14":"maria","2027-09-15":"maria","2027-09-16":"maria","2027-09-17":"maria","2027-09-18":"maria","2027-09-19":"maria","2027-09-20":"enrique","2027-09-21":"enrique","2027-09-22":"enrique","2027-09-23":"enrique","2027-09-24":"enrique","2027-09-25":"enrique","2027-09-26":"enrique","2027-09-27":"maria","2027-09-28":"maria","2027-09-29":"maria","2027-09-30":"maria","2027-10-01":"maria","2027-10-02":"maria","2027-10-03":"maria","2027-10-04":"enrique","2027-10-05":"enrique","2027-10-06":"enrique","2027-10-07":"enrique","2027-10-08":"enrique","2027-10-09":"enrique","2027-10-10":"enrique","2027-10-11":"maria","2027-10-12":"maria","2027-10-13":"maria","2027-10-14":"maria","2027-10-15":"maria","2027-10-16":"maria","2027-10-17":"maria","2027-10-18":"enrique","2027-10-19":"enrique","2027-10-20":"enrique","2027-10-21":"enrique","2027-10-22":"enrique","2027-10-23":"enrique","2027-10-24":"enrique","2027-10-25":"maria","2027-10-26":"maria","2027-10-27":"maria","2027-10-28":"maria","2027-10-29":"maria","2027-10-30":"maria","2027-10-31":"maria","2027-11-01":"enrique","2027-11-02":"enrique","2027-11-03":"enrique","2027-11-04":"enrique","2027-11-05":"enrique","2027-11-06":"enrique","2027-11-07":"enrique","2027-11-08":"maria","2027-11-09":"maria","2027-11-10":"maria","2027-11-11":"maria","2027-11-12":"maria","2027-11-13":"maria","2027-11-14":"maria","2027-11-15":"enrique","2027-11-16":"enrique","2027-11-17":"enrique","2027-11-18":"enrique","2027-11-19":"enrique","2027-11-20":"enrique","2027-11-21":"enrique","2027-11-22":"maria","2027-11-23":"maria","2027-11-24":"maria","2027-11-25":"maria","2027-11-26":"maria","2027-11-27":"maria","2027-11-28":"maria","2027-11-29":"enrique","2027-11-30":"enrique","2027-12-01":"enrique","2027-12-02":"enrique","2027-12-03":"enrique","2027-12-04":"enrique","2027-12-05":"enrique","2027-12-06":"maria","2027-12-07":"maria","2027-12-08":"maria","2027-12-09":"maria","2027-12-10":"maria","2027-12-11":"maria","2027-12-12":"maria","2027-12-13":"enrique","2027-12-14":"enrique","2027-12-15":"enrique","2027-12-16":"enrique","2027-12-17":"enrique","2027-12-18":"enrique","2027-12-19":"enrique","2027-12-20":"maria","2027-12-21":"maria","2027-12-22":"maria","2027-12-23":"maria","2027-12-24":"maria","2027-12-25":"maria","2027-12-26":"maria","2027-12-27":"enrique","2027-12-28":"enrique","2027-12-29":"enrique","2027-12-30":"enrique","2027-12-31":"enrique"};
+const holidays={"2027-01-01":"Año Nuevo","2027-01-06":"Reyes","2027-03-19":"San José","2027-03-25":"Jueves Santo","2027-03-26":"Viernes Santo","2027-05-01":"Fiesta del Trabajo","2027-05-15":"San Isidro","2027-08-16":"Asunción","2027-10-12":"Fiesta Nacional","2027-11-01":"Todos los Santos","2027-11-09":"Almudena","2027-12-06":"Constitución","2027-12-08":"Inmaculada","2027-12-25":"Navidad"};
 const changeDays={"2027-03-25":"Cambio a medio día"};
-const holidays={"2027-01-01": "Año Nuevo", "2027-01-06": "Reyes", "2027-03-19": "San José", "2027-03-25": "Jueves Santo", "2027-03-26": "Viernes Santo", "2027-05-01": "Fiesta del Trabajo", "2027-05-15": "San Isidro", "2027-08-16": "Asunción", "2027-10-12": "Fiesta Nacional", "2027-11-01": "Todos los Santos", "2027-11-09": "Almudena", "2027-12-06": "Constitución", "2027-12-08": "Inmaculada", "2027-12-25": "Navidad"};
 const months=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-const now=new Date();
-let currentMonth=now.getMonth();
+
+let calendar={...fallback};
+let session=null;
+let selectedUser=null;
+let currentMonth=new Date().getMonth();
+let selected=new Set();
+let proposals=[];
 
 function key(m,d){return `${YEAR}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
-function monday(d){const x=new Date(d);const n=(x.getDay()+6)%7;x.setDate(x.getDate()-n);return x}
+function parseDay(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
+function monday(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+function isCurrentWeek(s){const now=new Date();if(now.getFullYear()!==YEAR)return false;const d=parseDay(s),a=monday(now),b=new Date(a);b.setDate(a.getDate()+6);return d>=a&&d<=b}
+function pretty(s){return new Intl.DateTimeFormat("es-ES",{day:"numeric",month:"short"}).format(parseDay(s))}
+function other(owner){return owner==="enrique"?"maria":"enrique"}
+function displayOwner(o){return o==="enrique"?"Enrique":"María"}
+function currentUserName(){if(!session)return "";return session.user.email?.startsWith("enrique")?"Enrique":"María"}
+function openModal(id,on){document.getElementById(id).classList.toggle("show",on)}
 
-function isCurrentWeekDate(y,m,d){
-  if(now.getFullYear()!==YEAR) return false;
-  const target=new Date(y,m,d);
-  const start=monday(now);
-  start.setHours(0,0,0,0);
-  const end=new Date(start);
-  end.setDate(start.getDate()+6);
-  end.setHours(23,59,59,999);
-  return target>=start && target<=end;
+async function loadCalendar(){
+  const {data,error}=await sb.from("calendar_days").select("day,owner").gte("day","2027-01-01").lte("day","2027-12-31");
+  if(!error&&data?.length){calendar={};data.forEach(r=>calendar[r.day]=r.owner)}
+  render();
 }
 
+async function loadSession(){
+  const {data}=await sb.auth.getSession();
+  session=data.session;
+  updateAuthUI();
+  if(session)await loadProposals();
+}
+
+function updateAuthUI(){
+  document.getElementById("loginBtn").classList.toggle("hidden",!!session);
+  document.getElementById("logoutBtn").classList.toggle("hidden",!session);
+  document.getElementById("pendingBtn").classList.toggle("hidden",!session);
+  if(session)document.getElementById("logoutBtn").textContent=`Salir · ${currentUserName()}`;
+  if(!session){
+    selected.clear();
+    document.getElementById("proposalsPanel").classList.add("hidden");
+  }
+  updateSelectionBar();
+}
+
+function updateSelectionBar(){
+  document.getElementById("selectedCount").textContent=selected.size;
+  document.getElementById("selectionBar").classList.toggle("show",!!session&&selected.size>0);
+}
+
+function toggleDay(s){
+  if(!session){openModal("loginModal",true);return}
+  if(selected.has(s))selected.delete(s); else selected.add(s);
+  updateSelectionBar();
+  renderMonth();
+}
 
 function renderMonth(){
   document.getElementById("monthTitle").textContent=`${months[currentMonth]} 2027`;
-  const out=document.getElementById("days");out.innerHTML="";
-  const first=new Date(YEAR,currentMonth,1), offset=(first.getDay()+6)%7, count=new Date(YEAR,currentMonth+1,0).getDate();
-  for(let i=0;i<offset;i++){const e=document.createElement("div");e.className="day empty";out.appendChild(e)}
+  const root=document.getElementById("days"); root.innerHTML="";
+  const first=new Date(YEAR,currentMonth,1), off=(first.getDay()+6)%7, count=new Date(YEAR,currentMonth+1,0).getDate();
+  for(let i=0;i<off;i++){const e=document.createElement("div");e.className="day empty";root.appendChild(e)}
   for(let d=1;d<=count;d++){
-    const k=key(currentMonth,d), who=schedule[k], hol=holidays[k], change=changeDays[k];
-    const e=document.createElement("div");e.className=`day ${who||""}${hol?" holiday":""}${change?" change-day":""}${isCurrentWeekDate(YEAR,currentMonth,d)?" current-week":""}`;
-    if(now.getFullYear()===YEAR&&now.getMonth()===currentMonth&&now.getDate()===d)e.classList.add("today");
-    const n=document.createElement("div");n.className="num";n.textContent=d;e.appendChild(n);
-    if(change){const c=document.createElement("div");c.className="change-label";c.textContent=change;e.appendChild(c)}
-    else if(hol){const h=document.createElement("div");h.className="holiday-name";h.textContent=hol;e.appendChild(h)}
-    else{const o=document.createElement("div");o.className="owner";o.textContent=who==="enrique"?"ENRIQUE":"MARÍA";e.appendChild(o)}
-    out.appendChild(e)
+    const s=key(currentMonth,d), owner=calendar[s], hol=holidays[s], change=changeDays[s];
+    const e=document.createElement("button");
+    e.type="button";
+    e.className=`day ${owner||""}${hol?" holiday":""}${change?" change-day":""}${isCurrentWeek(s)?" current-week":""}${selected.has(s)?" selected":""}`;
+    const n=document.createElement("span");n.className="num";n.textContent=d;e.appendChild(n);
+    if(selected.has(s)){const mk=document.createElement("span");mk.className="selectmark";mk.textContent="✓";e.appendChild(mk)}
+    const lab=document.createElement("span");lab.className="smalllabel";lab.textContent=change||hol||displayOwner(owner);e.appendChild(lab);
+    e.addEventListener("click",()=>toggleDay(s));
+    root.appendChild(e)
   }
 }
 
-
 function renderYear(){
-  const root=document.getElementById("yearGrid");root.innerHTML="";
+  const root=document.getElementById("yearGrid"); root.innerHTML="";
   for(let m=0;m<12;m++){
     const box=document.createElement("div");box.className="mini";
     const t=document.createElement("div");t.className="mini-title";t.textContent=months[m];box.appendChild(t);
     const g=document.createElement("div");g.className="mini-grid";
-    ["L","M","X","J","V","S","D"].forEach(x=>{const w=document.createElement("div");w.className="mwd";w.textContent=x;g.appendChild(w)});
+    ["L","M","X","J","V","S","D"].forEach(v=>{const x=document.createElement("div");x.className="mwd";x.textContent=v;g.appendChild(x)});
     const first=new Date(YEAR,m,1),off=(first.getDay()+6)%7,cnt=new Date(YEAR,m+1,0).getDate();
     for(let i=0;i<off;i++)g.appendChild(document.createElement("div"));
-    for(let d=1;d<=cnt;d++){const k=key(m,d),x=document.createElement("div");x.className=`md ${schedule[k]||""}${holidays[k]?" holiday":""}${changeDays[k]?" change-day":""}${isCurrentWeekDate(YEAR,m,d)?" current-week":""}`;x.textContent=d;g.appendChild(x)}
-    box.appendChild(g);if(m===2){const n=document.createElement("div");n.className="mini-note";n.textContent="25 · Cambio a medio día";box.appendChild(n)}box.onclick=()=>{currentMonth=m;showMonth()};root.appendChild(box)
+    for(let d=1;d<=cnt;d++){
+      const s=key(m,d),x=document.createElement("div");
+      x.className=`md ${calendar[s]||""}${holidays[s]?" holiday":""}${changeDays[s]?" change-day":""}${isCurrentWeek(s)?" current-week":""}`;
+      x.textContent=d;g.appendChild(x)
+    }
+    box.appendChild(g);
+    box.addEventListener("click",()=>{currentMonth=m;showMonth(false)});
+    root.appendChild(box)
   }
 }
 
-function showMonth(){document.getElementById("monthView").classList.remove("hidden");document.getElementById("yearView").classList.add("hidden");document.getElementById("bMonth").classList.add("active");document.getElementById("bYear").classList.remove("active");renderMonth()}
-function showYear(){document.getElementById("monthView").classList.add("hidden");document.getElementById("yearView").classList.remove("hidden");document.getElementById("bMonth").classList.remove("active");document.getElementById("bYear").classList.add("active");renderYear()}
+function render(){renderYear();renderMonth()}
 
+function showYear(){
+  document.getElementById("yearView").classList.remove("hidden");
+  document.getElementById("monthView").classList.add("hidden");
+  document.getElementById("monthNav").classList.add("hidden");
+  document.getElementById("yearBtn").classList.add("active");
+  document.getElementById("monthBtn").classList.remove("active");
+  renderYear()
+}
+
+function showMonth(goCurrent=true){
+  if(goCurrent)currentMonth=new Date().getMonth();
+  document.getElementById("yearView").classList.add("hidden");
+  document.getElementById("monthView").classList.remove("hidden");
+  document.getElementById("monthNav").classList.remove("hidden");
+  document.getElementById("yearBtn").classList.remove("active");
+  document.getElementById("monthBtn").classList.add("active");
+  renderMonth()
+}
+
+async function loadProposals(){
+  if(!session)return;
+  const {data,error}=await sb.from("change_proposals")
+    .select("id,created_by,status,created_at,reviewed_at,change_proposal_days(day,from_owner,to_owner)")
+    .order("created_at",{ascending:false}).limit(30);
+  if(error)return;
+  proposals=data||[];
+  const incoming=proposals.filter(p=>p.status==="pending"&&p.created_by!==session.user.id);
+  document.getElementById("pendingCount").textContent=incoming.length;
+  renderProposals()
+}
+
+function renderProposals(){
+  const root=document.getElementById("proposalsList");root.innerHTML="";
+  if(!proposals.length){root.innerHTML='<div class="muted">No hay propuestas todavía.</div>';return}
+  proposals.forEach(p=>{
+    const wrap=document.createElement("div");wrap.className="proposal";
+    const mine=p.created_by===session.user.id;
+    const title=document.createElement("div");title.className="proposal-title";
+    const status=p.status==="pending"?"Pendiente":p.status==="accepted"?"Aceptada":p.status==="rejected"?"Rechazada":"Cancelada";
+    title.textContent=`${mine?"Tu propuesta":"Propuesta recibida"} · ${status}`;
+    wrap.appendChild(title);
+
+    const chips=document.createElement("div");chips.className="chips";
+    (p.change_proposal_days||[]).sort((a,b)=>a.day.localeCompare(b.day)).forEach(d=>{
+      const c=document.createElement("span");c.className="chip";
+      c.textContent=`${pretty(d.day)} · ${displayOwner(d.from_owner)} → ${displayOwner(d.to_owner)}`;
+      chips.appendChild(c)
+    });
+    wrap.appendChild(chips);
+
+    if(p.status==="pending"){
+      const row=document.createElement("div");row.className="row";
+      if(mine){
+        const b=document.createElement("button");b.className="btn danger";b.textContent="Cancelar propuesta";
+        b.onclick=()=>cancelProposal(p.id);row.appendChild(b)
+      } else {
+        const a=document.createElement("button");a.className="btn blue";a.textContent="Aceptar todo";
+        a.onclick=()=>reviewProposal(p.id,"accepted");
+        const r=document.createElement("button");r.className="btn danger";r.textContent="Rechazar";
+        r.onclick=()=>reviewProposal(p.id,"rejected");
+        row.append(a,r)
+      }
+      wrap.appendChild(row)
+    }
+    root.appendChild(wrap)
+  })
+}
+
+async function sendProposal(){
+  if(!session||!selected.size)return;
+  const days=[...selected].sort().map(day=>({day,to_owner:other(calendar[day])}));
+  document.getElementById("sendProposal").disabled=true;
+  const {error}=await sb.rpc("create_change_proposal",{p_days:days});
+  document.getElementById("sendProposal").disabled=false;
+  if(error){alert(error.message);return}
+  selected.clear();
+  openModal("reviewModal",false);
+  updateSelectionBar();
+  renderMonth();
+  await loadProposals();
+  document.getElementById("proposalsPanel").classList.remove("hidden")
+}
+
+async function reviewProposal(id,decision){
+  const {error}=await sb.rpc("review_change_proposal",{p_proposal_id:id,p_decision:decision});
+  if(error){alert(error.message);return}
+  await loadCalendar();
+  await loadProposals()
+}
+
+async function cancelProposal(id){
+  const {error}=await sb.rpc("cancel_change_proposal",{p_proposal_id:id});
+  if(error){alert(error.message);return}
+  await loadProposals()
+}
+
+document.getElementById("yearBtn").onclick=showYear;
+document.getElementById("monthBtn").onclick=()=>showMonth(true);
 document.getElementById("prev").onclick=()=>{currentMonth=(currentMonth+11)%12;renderMonth()};
 document.getElementById("next").onclick=()=>{currentMonth=(currentMonth+1)%12;renderMonth()};
-document.getElementById("bMonth").onclick=()=>{currentMonth=now.getMonth();showMonth()};
-document.getElementById("bYear").onclick=showYear;
-renderYear();
+document.getElementById("clearSel").onclick=()=>{selected.clear();updateSelectionBar();renderMonth()};
+
+document.getElementById("reviewSel").onclick=()=>{
+  const root=document.getElementById("reviewList");root.innerHTML="";
+  [...selected].sort().forEach(s=>{
+    const c=document.createElement("span");c.className="chip";
+    c.textContent=`${pretty(s)} · ${displayOwner(calendar[s])} → ${displayOwner(other(calendar[s]))}`;
+    root.appendChild(c)
+  });
+  openModal("reviewModal",true)
+};
+
+document.getElementById("closeReview").onclick=()=>openModal("reviewModal",false);
+document.getElementById("sendProposal").onclick=sendProposal;
+document.getElementById("loginBtn").onclick=()=>openModal("loginModal",true);
+document.getElementById("closeLogin").onclick=()=>openModal("loginModal",false);
+
+document.getElementById("chooseEnrique").onclick=()=>{
+  selectedUser="enrique";
+  document.getElementById("chooseEnrique").classList.add("active");
+  document.getElementById("chooseMaria").classList.remove("active");
+};
+document.getElementById("chooseMaria").onclick=()=>{
+  selectedUser="maria";
+  document.getElementById("chooseMaria").classList.add("active");
+  document.getElementById("chooseEnrique").classList.remove("active");
+};
+
+document.getElementById("doLogin").onclick=async()=>{
+  if(!selectedUser){document.getElementById("loginError").textContent="Selecciona Enrique o María.";return}
+  const password=document.getElementById("passInput").value;
+  const email=selectedUser==="enrique"?"enrique@calendario.local":"maria@calendario.local";
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error){document.getElementById("loginError").textContent="No se ha podido entrar. Revisa la contraseña.";return}
+  session=data.session;
+  document.getElementById("passInput").value="";
+  document.getElementById("loginError").textContent="";
+  openModal("loginModal",false);
+  updateAuthUI();
+  await loadProposals()
+};
+
+document.getElementById("logoutBtn").onclick=async()=>{
+  await sb.auth.signOut();
+  session=null;selectedUser=null;
+  updateAuthUI();showYear()
+};
+
+document.getElementById("pendingBtn").onclick=()=>{
+  document.getElementById("proposalsPanel").classList.toggle("hidden");
+  if(!document.getElementById("proposalsPanel").classList.contains("hidden"))loadProposals()
+};
+
+render();
+showYear();
+loadCalendar();
+loadSession();
 </script>
 </body>
 </html>
